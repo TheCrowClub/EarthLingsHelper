@@ -1,8 +1,11 @@
-from pyrogram import Client
-from dotenv import dotenv_values
 import logging
+from asyncio import get_running_loop
 from importlib import import_module
 from os import listdir
+
+from dotenv import dotenv_values
+from mongox import Client as MongoClient
+from pyrogram import Client
 
 CONFIG = dotenv_values("config.env")
 
@@ -14,10 +17,14 @@ logging.basicConfig(
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-MUST_REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN"]
+MUST_REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN", "MONGODB_URI", "SUDO_USERS"]
 for key in MUST_REQUIRED_KEYS:
     if key not in CONFIG:
         raise Exception(f"{key} is missing in config.env")
+
+SUDOERS = [int(uid) for uid in CONFIG["SUDO_USERS"].split()]
+MongoClient = MongoClient(CONFIG["MONGODB_URI"], get_event_loop=get_running_loop)
+db = MongoClient.get_database("alien")
 
 
 class Bot(Client):

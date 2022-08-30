@@ -1,9 +1,9 @@
-FROM rozari0/python:latest
+FROM python3.10.6:slim-buster
 
 WORKDIR /app
 
 COPY . .
 
-RUN pipenv install --system --deploy --ignore-pipfile
+RUN pip3 install -U -r requirements.txt
 
 CMD ["python3","-m","bot"]
